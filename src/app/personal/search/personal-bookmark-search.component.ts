@@ -62,23 +62,6 @@ export class PersonalBookmarkSearchComponent implements OnInit, AfterViewInit  {
     this.router.navigate(link, { relativeTo: this.route });
   }
 
-  deleteBookmark(deleted: Bookmark): void {
-
-    const obs = this.userBookmarkStore.deleteBookmark(deleted);
-    obs.subscribe(
-      res => {
-        this.zone.run(() => {
-          console.log('ZONE RUN bookmark deleted');
-        });
-
-        setTimeout(() => {
-          this.term.reset();
-        });
-
-      });
-  }
-
-
   ngAfterViewInit(): void {
     if (this.query) {
       console.log('---------------- set QUERY ' + this.query);

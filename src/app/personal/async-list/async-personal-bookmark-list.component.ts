@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, NgZone, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Observable} from 'rxjs/Observable';
 import {Bookmark} from '../../core/model/bookmark';
@@ -26,6 +26,7 @@ export class AsyncUserBookmarksListComponent implements OnInit {
   }
 
   constructor(
+    private zone: NgZone,
     private route: ActivatedRoute,
     private router: Router,
     private userBookmarkStore: PersonalBookmarksStore,
@@ -43,6 +44,25 @@ export class AsyncUserBookmarksListComponent implements OnInit {
 
   deleteBookmark(bookmark: Bookmark): void {
     const obs = this.userBookmarkStore.deleteBookmark(bookmark);
+    obs.subscribe(
+      res => {
+        this.zone.run(() => {
+          console.log('ZONE RUN bookmark deleted');
+        });
+      });
+    this.bookmarks.subscribe(res => {
+      this.zone.run(() => {
+        console.log('ZONE RUN bookmark deleted');
+      });
+      const result: Bookmark[] = [];
+      for (let bookmarkIterator of res) {
+        if ( bookmarkIterator._id !== bookmark._id ) {
+          result.push(bookmarkIterator);
+        }
+      }
+
+      this.bookmarks = Observable.of(result);
+    });
   }
 
   starBookmark(bookmark: Bookmark): void {
